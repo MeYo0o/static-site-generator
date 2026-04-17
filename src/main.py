@@ -8,6 +8,8 @@ from block_markdown import markdown_to_html_node, extract_title
 def main():
     dir_path_static = "./static"
     dir_path_public = "./public"
+    dir_path_content = "./content"
+    template_path = "template.html"
 
     print("Deleting public directory...")
     if os.path.exists(dir_path_public):
@@ -17,31 +19,20 @@ def main():
     copy_files_recursive(dir_path_static, dir_path_public)
 
     print("Generating pages...")
-    generate_page(
-        os.path.join("content", "index.md"),
-        "template.html",
-        os.path.join("public", "index.html"),
-    )
-    generate_page(
-        os.path.join("content", "blog", "glorfindel", "index.md"),
-        "template.html",
-        os.path.join("public", "blog", "glorfindel", "index.html"),
-    )
-    generate_page(
-        os.path.join("content", "blog", "tom", "index.md"),
-        "template.html",
-        os.path.join("public", "blog", "tom", "index.html"),
-    )
-    generate_page(
-        os.path.join("content", "blog", "majesty", "index.md"),
-        "template.html",
-        os.path.join("public", "blog", "majesty", "index.html"),
-    )
-    generate_page(
-        os.path.join("content", "contact", "index.md"),
-        "template.html",
-        os.path.join("public", "contact", "index.html"),
-    )
+    generate_pages_recursive(dir_path_content, template_path, dir_path_public)
+
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for filename in os.listdir(dir_path_content):
+        from_path = os.path.join(dir_path_content, filename)
+        dest_path = os.path.join(dest_dir_path, filename)
+
+        if os.path.isfile(from_path):
+            if from_path.endswith(".md"):
+                dest_path = dest_path.replace(".md", ".html")
+                generate_page(from_path, template_path, dest_path)
+        else:
+            generate_pages_recursive(from_path, template_path, dest_path)
 
 
 def generate_page(from_path, template_path, dest_path):
