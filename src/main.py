@@ -1,28 +1,33 @@
 import os
 import shutil
+import sys
 
 from copystatic import copy_files_recursive
 from block_markdown import markdown_to_html_node, extract_title
 
 
 def main():
+    basepath = "/"
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+
     dir_path_static = "./static"
-    dir_path_public = "./public"
+    dir_path_docs = "./docs"
     dir_path_content = "./content"
     template_path = "template.html"
 
-    print("Deleting public directory...")
-    if os.path.exists(dir_path_public):
-        shutil.rmtree(dir_path_public)
+    print(f"Deleting {dir_path_docs} directory...")
+    if os.path.exists(dir_path_docs):
+        shutil.rmtree(dir_path_docs)
 
-    print("Copying static files to public directory...")
-    copy_files_recursive(dir_path_static, dir_path_public)
+    print(f"Copying static files to {dir_path_docs} directory...")
+    copy_files_recursive(dir_path_static, dir_path_docs)
 
     print("Generating pages...")
-    generate_pages_recursive(dir_path_content, template_path, dir_path_public)
+    generate_pages_recursive(dir_path_content, template_path, dir_path_docs, basepath)
 
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     for filename in os.listdir(dir_path_content):
         from_path = os.path.join(dir_path_content, filename)
         dest_path = os.path.join(dest_dir_path, filename)
@@ -30,12 +35,12 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
         if os.path.isfile(from_path):
             if from_path.endswith(".md"):
                 dest_path = dest_path.replace(".md", ".html")
-                generate_page(from_path, template_path, dest_path)
+                generate_page(from_path, template_path, dest_path, basepath)
         else:
-            generate_pages_recursive(from_path, template_path, dest_path)
+            generate_pages_recursive(from_path, template_path, dest_path, basepath)
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     if not os.path.exists(from_path):
@@ -57,6 +62,10 @@ def generate_page(from_path, template_path, dest_path):
     final_html = template.replace("{{ Title }}", title).replace(
         "{{ Content }}", html_content
     )
+
+    # Rewrite paths for sub-directory hosting
+    final_html = final_html.replace('href="/', f'href="{basepath}')
+    final_html = final_html.replace('src="/', f'src="{basepath}')
 
     dest_dir = os.path.dirname(dest_path)
     if dest_dir != "" and not os.path.exists(dest_dir):
