@@ -16,11 +16,31 @@ def main():
     print("Copying static files to public directory...")
     copy_files_recursive(dir_path_static, dir_path_public)
 
-    print("Generating page...")
+    print("Generating pages...")
     generate_page(
         os.path.join("content", "index.md"),
         "template.html",
         os.path.join("public", "index.html"),
+    )
+    generate_page(
+        os.path.join("content", "blog", "glorfindel", "index.md"),
+        "template.html",
+        os.path.join("public", "blog", "glorfindel", "index.html"),
+    )
+    generate_page(
+        os.path.join("content", "blog", "tom", "index.md"),
+        "template.html",
+        os.path.join("public", "blog", "tom", "index.html"),
+    )
+    generate_page(
+        os.path.join("content", "blog", "majesty", "index.md"),
+        "template.html",
+        os.path.join("public", "blog", "majesty", "index.html"),
+    )
+    generate_page(
+        os.path.join("content", "contact", "index.md"),
+        "template.html",
+        os.path.join("public", "contact", "index.html"),
     )
 
 
