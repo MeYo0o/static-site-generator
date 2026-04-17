@@ -1,5 +1,5 @@
 import unittest
-from block_markdown import markdown_to_blocks, block_to_block_type, BlockType
+from block_markdown import markdown_to_blocks, block_to_block_type, BlockType, extract_title
 
 
 class TestBlockMarkdown(unittest.TestCase):
@@ -59,6 +59,19 @@ This is the same paragraph on a new line
         self.assertEqual(block_to_block_type(block), BlockType.ORDERED_LIST)
         block = "paragraph"
         self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_extract_title(self):
+        md = "# Hello"
+        self.assertEqual(extract_title(md), "Hello")
+        md = "#  Hello "
+        self.assertEqual(extract_title(md), "Hello")
+        md = """
+# Hello
+"""
+        self.assertEqual(extract_title(md), "Hello")
+        md = "No title"
+        with self.assertRaises(Exception):
+            extract_title(md)
 
 
 if __name__ == "__main__":

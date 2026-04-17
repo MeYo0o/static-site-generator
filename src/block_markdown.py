@@ -161,3 +161,11 @@ def paragraph_to_html_node(block):
     paragraph = " ".join(lines)
     children = text_to_children(paragraph)
     return ParentNode("p", children)
+
+
+def extract_title(md):
+    lines = md.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            return line[2:].strip()
+    raise Exception("No h1 header found")
